@@ -1,0 +1,39 @@
+package com.example.claritypay.presentation.screens
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.claritypay.ClarityPayApp
+import com.example.claritypay.presentation.components.AppScaffold
+import com.example.claritypay.presentation.components.ExpenseCard
+import com.example.claritypay.presentation.components.InfoMessageCard
+import com.example.claritypay.presentation.viewmodels.AppViewModelFactory
+import com.example.claritypay.presentation.viewmodels.ExpensesViewModel
+
+@Composable
+fun ExpensesScreenRoute() {
+    val app = LocalContext.current.applicationContext as ClarityPayApp
+    val viewModel: ExpensesViewModel = viewModel(factory = AppViewModelFactory(app.container))
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    AppScaffold(title = "Gastos") {
+        InfoMessageCard("Agrupados por categoria para mantener la vista simple en esta primera version.")
+        Spacer(modifier = Modifier.height(16.dp))
+        if (state.expenses.isEmpty()) {
+            InfoMessageCard("Todavia no hay gastos registrados.")
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                state.expenses.forEach { expense ->
+                    ExpenseCard(expense)
+                }
+            }
+        }
+    }
+}
