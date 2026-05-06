@@ -28,6 +28,12 @@ class AuthRepositoryImpl(
         if (fullName.isBlank() || email.isBlank() || password.isBlank()) {
             return AppResult.Error("Completa todos los campos para crear tu cuenta.")
         }
+
+        val existingUser = userDao.getUserByEmail(email.trim())
+        if (existingUser != null) {
+            return AppResult.Error("Ya existe una cuenta con este correo.")
+        }
+
         userDao.logoutAll()
         val newUserId = userDao.insert(
             UserEntity(
@@ -37,14 +43,11 @@ class AuthRepositoryImpl(
                 isLoggedIn = true
             )
         )
-        if (userDao.getUserByEmail(email.trim())?.id != newUserId) {
-            return AppResult.Error("Ya existe una cuenta con este correo.")
-        }
+
         if (email.trim() == "demo@claritypay.app") {
             seedDemoTransactions(newUserId)
-        } else {
-            // New users start empty
         }
+
         val user = userDao.getUserById(newUserId)?.toDomain()
             ?: return AppResult.Error("No se pudo crear la cuenta.")
         return AppResult.Success(user)
@@ -54,17 +57,56 @@ class AuthRepositoryImpl(
         val user = userDao.getUserByEmail(email.trim())
             ?: return AppResult.Error("No encontramos una cuenta con ese correo.")
         if (user.password != password.trim()) {
-            return AppResult.Error("La contrasena no es correcta.")
+            return AppResult.Error("La contraseña no es correcta.")
         }
         userDao.logoutAll()
         userDao.markLoggedIn(user.id)
-        // Demo data already seeded at registration, no need to reseed
         return AppResult.Success(user.toDomain())
     }
 
     override suspend fun logout() {
         userDao.logoutAll()
     }
+
+    // --- NUEVOS MÉTODOS FASE 2 ---
+
+    override suspend fun updateProfile(user: User): AppResult<Unit> {
+        return try {
+            val currentEntity = userDao.getUserById(user.id)
+            if (currentEntity != null) {
+                // Usamos .copy() para actualizar solo lo necesario sin perder la contraseña
+                userDao.update(
+                    currentEntity.copy(
+                        fullName = user.fullName,
+                        bio = user.bio,
+                        profileImageUrl = user.profileImageUrl
+                    )
+                )
+                AppResult.Success(Unit)
+            } else {
+                AppResult.Error("Usuario no encontrado.")
+            }
+        } catch (e: Exception) {
+            AppResult.Error(e.message ?: "Error al actualizar el perfil.")
+        }
+    }
+
+    override suspend fun resetPassword(email: String, newPassword: String): AppResult<Unit> {
+        return try {
+            if (newPassword.isBlank()) return AppResult.Error("La contraseña no puede estar vacía.")
+
+            val rowsAffected = userDao.updatePasswordByEmail(email.trim(), newPassword.trim())
+            if (rowsAffected > 0) {
+                AppResult.Success(Unit)
+            } else {
+                AppResult.Error("No se encontró una cuenta con ese correo.")
+            }
+        } catch (e: Exception) {
+            AppResult.Error(e.message ?: "Error al recuperar la contraseña.")
+        }
+    }
+
+    // ----------------------------
 
     override suspend fun seedDemoUserIfNeeded() {
         if (userDao.countUsers() > 0) return
@@ -84,10 +126,10 @@ class AuthRepositoryImpl(
         if (transactionDao.countByUser(userId) > 0) return
         transactionDao.insertAll(
             listOf(
-                TransactionEntity(userId = userId, title = "Nomina abril", category = "Ingreso", amount = 2450.0, type = "INCOME", dateLabel = "Hoy"),
+                TransactionEntity(userId = userId, title = "Nómina abril", category = "Ingreso", amount = 2450.0, type = "INCOME", dateLabel = "Hoy"),
                 TransactionEntity(userId = userId, title = "Supermercado", category = "Casa", amount = 78.35, type = "EXPENSE", dateLabel = "Hoy"),
                 TransactionEntity(userId = userId, title = "Transporte", category = "Movilidad", amount = 14.20, type = "EXPENSE", dateLabel = "Ayer"),
-                TransactionEntity(userId = userId, title = "Cafe", category = "Personal", amount = 6.50, type = "EXPENSE", dateLabel = "Ayer"),
+                TransactionEntity(userId = userId, title = "Café", category = "Personal", amount = 6.50, type = "EXPENSE", dateLabel = "Ayer"),
                 TransactionEntity(userId = userId, title = "Internet", category = "Servicios", amount = 31.99, type = "EXPENSE", dateLabel = "Lunes"),
                 TransactionEntity(userId = userId, title = "Streaming", category = "Entretenimiento", amount = 12.99, type = "EXPENSE", dateLabel = "Domingo")
             )
@@ -98,5 +140,7 @@ class AuthRepositoryImpl(
 private fun UserEntity.toDomain(): User = User(
     id = id,
     fullName = fullName,
-    email = email
+    email = email,
+    bio = bio,
+    profileImageUrl = profileImageUrl
 )

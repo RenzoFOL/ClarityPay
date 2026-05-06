@@ -31,7 +31,9 @@ import com.example.claritypay.presentation.viewmodels.HomeViewModel
 @Composable
 fun HomeScreenRoute(
     onOpenExpenses: () -> Unit,
-    onOpenTransactions: () -> Unit
+    onOpenTransactions: () -> Unit,
+    onOpenProfile: () -> Unit,
+    onOpenStatistics: () -> Unit
 ) {
     val app = LocalContext.current.applicationContext as ClarityPayApp
     val viewModel: HomeViewModel = viewModel(factory = AppViewModelFactory(app.container))

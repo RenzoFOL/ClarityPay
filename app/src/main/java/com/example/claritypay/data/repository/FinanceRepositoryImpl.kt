@@ -3,6 +3,7 @@ package com.example.claritypay.data.repository
 import com.example.claritypay.data.local.dao.TransactionDao
 import com.example.claritypay.data.local.entity.TransactionEntity
 import com.example.claritypay.domain.models.BalanceSummary
+import com.example.claritypay.domain.models.CategoryStatistic
 import com.example.claritypay.domain.models.ExpenseItem
 import com.example.claritypay.domain.models.Transaction
 import com.example.claritypay.domain.repository.FinanceRepository
@@ -37,6 +38,16 @@ class FinanceRepositoryImpl(
                 .sortedByDescending { it.totalAmount }
         }
 
+    override fun observeCategoryStatistics(userId: Long): Flow<List<CategoryStatistic>> =
+        transactionDao.observeCategorySummaries(userId).map { summaries ->
+            summaries.map {
+                CategoryStatistic(
+                    category = it.category,
+                    totalAmount = it.total
+                )
+            }
+        }
+
     override fun observeRecentTransactions(userId: Long, limit: Int): Flow<List<Transaction>> =
         transactionDao.observeRecentTransactions(userId, limit).map { items ->
             items.map(TransactionEntity::toDomain)
@@ -50,6 +61,7 @@ class FinanceRepositoryImpl(
 
 private fun TransactionEntity.toDomain(): Transaction = Transaction(
     id = id,
+    userId = userId,
     title = title,
     category = category,
     amount = amount,

@@ -42,6 +42,27 @@ class AppViewModelFactory(
                     getTransactionsUseCase = container.getTransactionsUseCase
                 ) as T
             }
+
+            // --- NUEVOS VIEWMODELS FASE 2 ---
+
+            modelClass.isAssignableFrom(ProfileViewModel::class.java) -> {
+                ProfileViewModel(
+                    getCurrentUserUseCase = container.getCurrentUserUseCase,
+                    updateProfileUseCase = container.updateProfileUseCase
+                ) as T
+            }
+            modelClass.isAssignableFrom(StatisticsViewModel::class.java) -> {
+                StatisticsViewModel(
+                    getCurrentUserUseCase = container.getCurrentUserUseCase,
+                    getStatisticsUseCase = container.getStatisticsUseCase
+                ) as T
+            }
+            modelClass.isAssignableFrom(ResetPasswordViewModel::class.java) -> {
+                ResetPasswordViewModel(
+                    resetPasswordUseCase = container.resetPasswordUseCase
+                ) as T
+            }
+
             else -> error("Unknown ViewModel class: ${modelClass.name}")
         }
     }

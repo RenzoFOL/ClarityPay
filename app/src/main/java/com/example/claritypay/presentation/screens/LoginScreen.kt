@@ -30,9 +30,12 @@ import com.example.claritypay.presentation.components.InfoMessageCard
 import com.example.claritypay.presentation.viewmodels.AppViewModelFactory
 import com.example.claritypay.presentation.viewmodels.AuthUiState
 import com.example.claritypay.presentation.viewmodels.AuthViewModel
+import androidx.compose.ui.Alignment
 
 @Composable
-fun LoginScreenRoute(onRegisterClick: () -> Unit) {
+fun LoginScreenRoute(
+    onRegisterClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit) {
     val app = LocalContext.current.applicationContext as ClarityPayApp
     val viewModel: AuthViewModel = viewModel(factory = AppViewModelFactory(app.container))
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -41,7 +44,8 @@ fun LoginScreenRoute(onRegisterClick: () -> Unit) {
         onEmailChange = viewModel::onEmailChanged,
         onPasswordChange = viewModel::onPasswordChanged,
         onLoginClick = viewModel::login,
-        onRegisterClick = onRegisterClick
+        onRegisterClick = onRegisterClick,
+        onForgotPasswordClick = onForgotPasswordClick
     )
 }
 
@@ -51,7 +55,8 @@ private fun LoginScreen(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -103,6 +108,12 @@ private fun LoginScreen(
                 }
                 TextButton(onClick = onRegisterClick, modifier = Modifier.fillMaxWidth()) {
                     Text("Crear cuenta")
+                }
+                TextButton(
+                    onClick = onForgotPasswordClick,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("¿Olvidaste tu contraseña?", color = MaterialTheme.colorScheme.primary)
                 }
             }
         }

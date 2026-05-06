@@ -13,5 +13,8 @@ data class UserEntity(
     val fullName: String,
     val email: String,
     val password: String,
-    val isLoggedIn: Boolean = false
+    val isLoggedIn: Boolean = false,
+
+    val bio: String? = null,           // Para una breve descripción (puede ser nulo al registrarse)
+    val profileImageUrl: String? = null // Ruta local de la imagen de perfil (puede ser nulo)
 )
