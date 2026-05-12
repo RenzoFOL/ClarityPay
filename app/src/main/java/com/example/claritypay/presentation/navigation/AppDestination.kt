@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Subscriptions
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class AppDestination(
@@ -23,6 +24,12 @@ sealed class AppDestination(
     data object Statistics : AppDestination("statistics", "Estadísticas", Icons.Default.Assessment) // CU-14
     data object Transactions : AppDestination("transactions", "Historial", Icons.Default.History)
     data object Profile : AppDestination("profile", "Perfil", Icons.Default.AccountCircle) // CU-10
+
+    data object Subscriptions : AppDestination(
+        route = "subscriptions",
+        title = "Suscripciones",
+        icon = Icons.Default.Subscriptions // O Icons.Default.CreditCard
+    )
 }
 
 // Lista que controla qué iconos se ven en la NavigationBar
@@ -30,6 +37,7 @@ val authenticatedDestinations = listOf(
     AppDestination.Home,
     AppDestination.Expenses,
     AppDestination.Statistics, // Se agrega a la barra inferior
+    AppDestination.Subscriptions, // <--- AGREGADO AQUÍ
     AppDestination.Transactions,
     AppDestination.Profile      // Se agrega a la barra inferior
 )

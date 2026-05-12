@@ -42,6 +42,15 @@ class AppViewModelFactory(
                     getTransactionsUseCase = container.getTransactionsUseCase
                 ) as T
             }
+            modelClass.isAssignableFrom(SubscriptionsViewModel::class.java) -> {
+                SubscriptionsViewModel(
+                    getCurrentUserUseCase = container.getCurrentUserUseCase,
+                    getSubscriptionsUseCase = container.getSubscriptionsUseCase,
+                    addSubscriptionUseCase = container.addSubscriptionUseCase,
+                    updateSubscriptionUseCase = container.updateSubscriptionUseCase,
+                    deleteSubscriptionUseCase = container.deleteSubscriptionUseCase
+                ) as T
+            }
 
             // --- NUEVOS VIEWMODELS FASE 2 ---
 

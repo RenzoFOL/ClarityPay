@@ -4,13 +4,17 @@ import android.content.Context
 import com.example.claritypay.data.local.AppDatabase
 import com.example.claritypay.data.repository.AuthRepositoryImpl
 import com.example.claritypay.data.repository.FinanceRepositoryImpl
+import com.example.claritypay.data.repository.SubscriptionRepositoryImpl
 import com.example.claritypay.domain.repository.AuthRepository
 import com.example.claritypay.domain.repository.FinanceRepository
+import com.example.claritypay.domain.repository.SubscriptionRepository
 import com.example.claritypay.domain.usecases.*
 
 interface AppContainer {
     val authRepository: AuthRepository
     val financeRepository: FinanceRepository
+
+    val subscriptionRepository: SubscriptionRepository // Nuevo Fase 3
 
     val getCurrentUserUseCase: GetCurrentUserUseCase
     val loginUseCase: LoginUseCase
@@ -24,6 +28,12 @@ interface AppContainer {
     val updateProfileUseCase: UpdateProfileUseCase
     val resetPasswordUseCase: ResetPasswordUseCase
     val getStatisticsUseCase: GetStatisticsUseCase
+
+    // --- NUEVOS USE CASES FASE 3 ---
+    val getSubscriptionsUseCase: GetSubscriptionsUseCase
+    val addSubscriptionUseCase: AddSubscriptionUseCase
+    val updateSubscriptionUseCase: UpdateSubscriptionUseCase
+    val deleteSubscriptionUseCase: DeleteSubscriptionUseCase
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -38,6 +48,11 @@ class AppDataContainer(private val context: Context) : AppContainer {
 
     override val financeRepository: FinanceRepository by lazy {
         FinanceRepositoryImpl(database.transactionDao())
+    }
+
+    // --- REPOSITORIO FASE 3 ---
+    override val subscriptionRepository: SubscriptionRepository by lazy {
+        SubscriptionRepositoryImpl(database.subscriptionDao())
     }
 
     override val getCurrentUserUseCase: GetCurrentUserUseCase by lazy { GetCurrentUserUseCase(authRepository) }
@@ -60,5 +75,19 @@ class AppDataContainer(private val context: Context) : AppContainer {
 
     override val getStatisticsUseCase: GetStatisticsUseCase by lazy {
         GetStatisticsUseCase(financeRepository)
+    }
+
+    // --- INSTANCIAS FASE 3 ---
+    override val getSubscriptionsUseCase by lazy {
+        GetSubscriptionsUseCase(subscriptionRepository)
+    }
+    override val addSubscriptionUseCase by lazy {
+        AddSubscriptionUseCase(subscriptionRepository)
+    }
+    override val updateSubscriptionUseCase by lazy {
+        UpdateSubscriptionUseCase(subscriptionRepository)
+    }
+    override val deleteSubscriptionUseCase by lazy {
+        DeleteSubscriptionUseCase(subscriptionRepository)
     }
 }

@@ -112,6 +112,11 @@ fun ClarityPayAppRoot(sessionViewModel: SessionViewModel) {
             composable(AppDestination.Profile.route) {
                 ProfileScreenRoute()
             }
+            // --- DESTINO FASE 3: Suscripciones ---
+            composable(AppDestination.Subscriptions.route) {
+                // Llamamos a la función Route que creamos en SubscriptionsScreen.kt
+                SubscriptionsScreenRoute()
+            }
         }
     }
 }
