@@ -61,7 +61,11 @@ fun SubscriptionsScreen(viewModel: SubscriptionsViewModel) {
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(subscriptions) { sub ->
-                        SubscriptionItem(sub, onDelete = { viewModel.deleteSubscription(sub) })
+                        SubscriptionItem(
+                            subscription = sub,
+                            onEdit = viewModel::updateSubscription,
+                            onDelete = { viewModel.deleteSubscription(sub) }
+                        )
                     }
                 }
             }
@@ -102,13 +106,21 @@ fun AddSubscriptionDialog(
                 OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Fecha de cobro (aaaa-mm-dd)") }, modifier = Modifier.fillMaxWidth())
 
                 Text("Categoría:", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface)
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    categories.forEach { cat ->
-                        FilterChip(
-                            selected = category == cat,
-                            onClick = { category = cat },
-                            label = { Text(cat, style = MaterialTheme.typography.labelSmall) }
-                        )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    categories.chunked(2).forEach { rowItems ->
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            rowItems.forEach { cat ->
+                                FilterChip(
+                                    selected = category == cat,
+                                    onClick = { category = cat },
+                                    label = { Text(cat, style = MaterialTheme.typography.labelSmall) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            if (rowItems.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
 
@@ -130,7 +142,11 @@ fun AddSubscriptionDialog(
 }
 
 @Composable
-fun SubscriptionItem(subscription: Subscription, onDelete: () -> Unit) {
+fun SubscriptionItem(
+    subscription: Subscription,
+    onEdit: (Subscription) -> Unit,
+    onDelete: () -> Unit
+) {
     val daysRemaining = remember(subscription.nextPaymentDate) {
         try {
             val today = LocalDate.now()
@@ -174,8 +190,14 @@ fun SubscriptionItem(subscription: Subscription, onDelete: () -> Unit) {
                     // CAMBIO: Categoría ahora en color onSurface (Oscuro)
                     Text(text = subscription.category, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
                 }
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SubscriptionEditMenu(
+                        subscription = subscription,
+                        onSave = onEdit
+                    )
+                    IconButton(onClick = onDelete) {
+                        Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
 
@@ -225,6 +247,107 @@ fun SubscriptionItem(subscription: Subscription, onDelete: () -> Unit) {
                     modifier = Modifier.align(Alignment.End).padding(top = 4.dp),
                     color = if (daysRemaining <= 3) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun SubscriptionEditMenu(
+    subscription: Subscription,
+    onSave: (Subscription) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var name by remember(subscription.id, subscription.name) { mutableStateOf(subscription.name) }
+    var amount by remember(subscription.id, subscription.amount) { mutableStateOf(subscription.amount.toString()) }
+    var category by remember(subscription.id, subscription.category) { mutableStateOf(subscription.category) }
+    var date by remember(subscription.id, subscription.nextPaymentDate) { mutableStateOf(subscription.nextPaymentDate) }
+    var period by remember(subscription.id, subscription.period) { mutableStateOf(subscription.period) }
+    val categories = listOf("Entretenimiento", "Servicios", "Telefonía", "Otro")
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(Icons.Default.Edit, contentDescription = "Editar suscripcion")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.widthIn(min = 280.dp, max = 340.dp).padding(12.dp)
+        ) {
+            Text("Editar suscripcion", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Nombre") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = amount,
+                onValueChange = { amount = it },
+                label = { Text("Monto") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = date,
+                onValueChange = { date = it },
+                label = { Text("Fecha aaaa-mm-dd") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text("Categoria", style = MaterialTheme.typography.labelLarge)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                categories.chunked(2).forEach { rowItems ->
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        rowItems.forEach { cat ->
+                            FilterChip(
+                                selected = category == cat,
+                                onClick = { category = cat },
+                                label = { Text(cat, style = MaterialTheme.typography.labelSmall) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        if (rowItems.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text("Periodo", style = MaterialTheme.typography.labelLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(selected = period == "Mensual", onClick = { period = "Mensual" }, label = { Text("Mensual") })
+                FilterChip(selected = period == "Anual", onClick = { period = "Anual" }, label = { Text("Anual") })
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = { expanded = false }) {
+                    Text("Cancelar")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        val amountDouble = amount.toDoubleOrNull() ?: 0.0
+                        onSave(
+                            subscription.copy(
+                                name = name,
+                                amount = amountDouble,
+                                category = category,
+                                nextPaymentDate = date,
+                                period = period
+                            )
+                        )
+                        expanded = false
+                    }
+                ) {
+                    Text("Guardar")
+                }
             }
         }
     }

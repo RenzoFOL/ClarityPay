@@ -1,8 +1,10 @@
 package com.example.claritypay.data.repository
 
 import com.example.claritypay.core.common.AppResult
+import com.example.claritypay.data.local.dao.SubscriptionDao
 import com.example.claritypay.data.local.dao.TransactionDao
 import com.example.claritypay.data.local.dao.UserDao
+import com.example.claritypay.data.local.entity.SubscriptionEntity
 import com.example.claritypay.data.local.entity.TransactionEntity
 import com.example.claritypay.data.local.entity.UserEntity
 import com.example.claritypay.domain.models.User
@@ -13,7 +15,8 @@ import kotlinx.coroutines.flow.map
 
 class AuthRepositoryImpl(
     private val userDao: UserDao,
-    private val transactionDao: TransactionDao
+    private val transactionDao: TransactionDao,
+    private val subscriptionDao: SubscriptionDao
 ) : AuthRepository {
 
     override fun observeCurrentUser(): Flow<User?> =
@@ -46,6 +49,7 @@ class AuthRepositoryImpl(
 
         if (email.trim() == "demo@claritypay.app") {
             seedDemoTransactions(newUserId)
+            seedDemoSubscriptions(newUserId)
         }
 
         val user = userDao.getUserById(newUserId)?.toDomain()
@@ -109,6 +113,13 @@ class AuthRepositoryImpl(
     // ----------------------------
 
     override suspend fun seedDemoUserIfNeeded() {
+        val existingDemo = userDao.getUserByEmail("demo@claritypay.app")
+        if (existingDemo != null) {
+            seedDemoTransactions(existingDemo.id)
+            seedDemoSubscriptions(existingDemo.id)
+            return
+        }
+
         if (userDao.countUsers() > 0) return
 
         val demoUserId = userDao.insert(
@@ -120,6 +131,7 @@ class AuthRepositoryImpl(
             )
         )
         seedDemoTransactions(demoUserId)
+        seedDemoSubscriptions(demoUserId)
     }
 
     private suspend fun seedDemoTransactions(userId: Long) {
@@ -132,6 +144,17 @@ class AuthRepositoryImpl(
                 TransactionEntity(userId = userId, title = "Café", category = "Personal", amount = 6.50, type = "EXPENSE", dateLabel = "Ayer"),
                 TransactionEntity(userId = userId, title = "Internet", category = "Servicios", amount = 31.99, type = "EXPENSE", dateLabel = "Lunes"),
                 TransactionEntity(userId = userId, title = "Streaming", category = "Entretenimiento", amount = 12.99, type = "EXPENSE", dateLabel = "Domingo")
+            )
+        )
+    }
+
+    private suspend fun seedDemoSubscriptions(userId: Long) {
+        if (subscriptionDao.countByUser(userId) > 0) return
+        subscriptionDao.insertAll(
+            listOf(
+                SubscriptionEntity(userId = userId, name = "Netflix", amount = 15.49, category = "Entretenimiento", nextPaymentDate = "2026-05-18", period = "Mensual"),
+                SubscriptionEntity(userId = userId, name = "Internet hogar", amount = 31.99, category = "Servicios", nextPaymentDate = "2026-05-22", period = "Mensual"),
+                SubscriptionEntity(userId = userId, name = "Almacenamiento cloud", amount = 19.99, category = "Servicios", nextPaymentDate = "2026-06-05", period = "Anual")
             )
         )
     }

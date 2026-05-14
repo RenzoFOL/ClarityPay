@@ -12,9 +12,15 @@ interface SubscriptionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(subscription: SubscriptionEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(subscriptions: List<SubscriptionEntity>)
+
     @Update
     suspend fun update(subscription: SubscriptionEntity)
 
     @Delete
     suspend fun delete(subscription: SubscriptionEntity)
+
+    @Query("SELECT COUNT(*) FROM subscriptions WHERE userId = :userId")
+    suspend fun countByUser(userId: Long): Int
 }

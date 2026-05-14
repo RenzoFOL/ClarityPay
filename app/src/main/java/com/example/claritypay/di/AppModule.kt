@@ -24,6 +24,7 @@ interface AppContainer {
     val getRecentTransactionsUseCase: GetRecentTransactionsUseCase
     val getTransactionsUseCase: GetTransactionsUseCase
     val getExpensesUseCase: GetExpensesUseCase
+    val addTransactionUseCase: AddTransactionUseCase
     val seedDemoDataUseCase: SeedDemoDataUseCase
     val updateProfileUseCase: UpdateProfileUseCase
     val resetPasswordUseCase: ResetPasswordUseCase
@@ -43,11 +44,11 @@ class AppDataContainer(private val context: Context) : AppContainer {
     }
 
     override val authRepository: AuthRepository by lazy {
-        AuthRepositoryImpl(database.userDao(), database.transactionDao())
+        AuthRepositoryImpl(database.userDao(), database.transactionDao(), database.subscriptionDao())
     }
 
     override val financeRepository: FinanceRepository by lazy {
-        FinanceRepositoryImpl(database.transactionDao())
+        FinanceRepositoryImpl(database.transactionDao(), database.subscriptionDao())
     }
 
     // --- REPOSITORIO FASE 3 ---
@@ -63,6 +64,7 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val getRecentTransactionsUseCase: GetRecentTransactionsUseCase by lazy { GetRecentTransactionsUseCase(financeRepository) }
     override val getTransactionsUseCase: GetTransactionsUseCase by lazy { GetTransactionsUseCase(financeRepository) }
     override val getExpensesUseCase: GetExpensesUseCase by lazy { GetExpensesUseCase(financeRepository) }
+    override val addTransactionUseCase: AddTransactionUseCase by lazy { AddTransactionUseCase(financeRepository) }
     override val seedDemoDataUseCase: SeedDemoDataUseCase by lazy { SeedDemoDataUseCase(authRepository) }
 
     override val updateProfileUseCase: UpdateProfileUseCase by lazy {

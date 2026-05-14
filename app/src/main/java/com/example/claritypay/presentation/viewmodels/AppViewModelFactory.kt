@@ -33,13 +33,15 @@ class AppViewModelFactory(
             modelClass.isAssignableFrom(ExpensesViewModel::class.java) -> {
                 ExpensesViewModel(
                     getCurrentUserUseCase = container.getCurrentUserUseCase,
-                    getExpensesUseCase = container.getExpensesUseCase
+                    getExpensesUseCase = container.getExpensesUseCase,
+                    addTransactionUseCase = container.addTransactionUseCase
                 ) as T
             }
             modelClass.isAssignableFrom(TransactionsViewModel::class.java) -> {
                 TransactionsViewModel(
                     getCurrentUserUseCase = container.getCurrentUserUseCase,
-                    getTransactionsUseCase = container.getTransactionsUseCase
+                    getTransactionsUseCase = container.getTransactionsUseCase,
+                    addTransactionUseCase = container.addTransactionUseCase
                 ) as T
             }
             modelClass.isAssignableFrom(SubscriptionsViewModel::class.java) -> {

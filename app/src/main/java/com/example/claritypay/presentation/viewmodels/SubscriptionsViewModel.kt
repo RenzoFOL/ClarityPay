@@ -60,6 +60,12 @@ class SubscriptionsViewModel(
         }
     }
 
+    fun updateSubscription(subscription: Subscription) {
+        viewModelScope.launch {
+            _uiState.value = updateSubscriptionUseCase(subscription)
+        }
+    }
+
     fun clearState() {
         _uiState.value = null
     }

@@ -11,6 +11,7 @@ interface FinanceRepository {
     fun observeExpenses(userId: Long): Flow<List<ExpenseItem>>
     fun observeRecentTransactions(userId: Long, limit: Int = 5): Flow<List<Transaction>>
     fun observeAllTransactions(userId: Long): Flow<List<Transaction>>
+    suspend fun addTransaction(transaction: Transaction)
 
     fun observeCategoryStatistics(userId: Long): Flow<List<CategoryStatistic>>
 }
