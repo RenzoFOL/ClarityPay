@@ -35,6 +35,10 @@ interface AppContainer {
     val addSubscriptionUseCase: AddSubscriptionUseCase
     val updateSubscriptionUseCase: UpdateSubscriptionUseCase
     val deleteSubscriptionUseCase: DeleteSubscriptionUseCase
+
+    //AGREGADOS LOS CONTRATOS PARA LA FASE 4 ---
+    val getInsightsUseCase: GetInsightsUseCase
+    val getPricingPlansUseCase: GetPricingPlansUseCase
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -55,6 +59,8 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val subscriptionRepository: SubscriptionRepository by lazy {
         SubscriptionRepositoryImpl(database.subscriptionDao())
     }
+
+
 
     override val getCurrentUserUseCase: GetCurrentUserUseCase by lazy { GetCurrentUserUseCase(authRepository) }
     override val loginUseCase: LoginUseCase by lazy { LoginUseCase(authRepository) }
@@ -91,5 +97,13 @@ class AppDataContainer(private val context: Context) : AppContainer {
     }
     override val deleteSubscriptionUseCase by lazy {
         DeleteSubscriptionUseCase(subscriptionRepository)
+    }
+
+    // --- NUEVAS INSTANCIAS AGREGADAS PARA FASE 4 ---
+    override val getInsightsUseCase by lazy {
+        GetInsightsUseCase(financeRepository, subscriptionRepository)
+    }
+    override val getPricingPlansUseCase by lazy {
+        GetPricingPlansUseCase()
     }
 }

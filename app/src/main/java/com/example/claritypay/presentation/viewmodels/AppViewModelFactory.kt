@@ -74,6 +74,19 @@ class AppViewModelFactory(
                 ) as T
             }
 
+            // Agrega estos dos bloques dentro del "when" de tu AppViewModelFactory:
+            modelClass.isAssignableFrom(InsightsViewModel::class.java) -> {
+                InsightsViewModel(
+                    getCurrentUserUseCase = container.getCurrentUserUseCase,
+                    getInsightsUseCase = container.getInsightsUseCase
+                ) as T
+            }
+            modelClass.isAssignableFrom(PlansViewModel::class.java) -> {
+                PlansViewModel(
+                    getPricingPlansUseCase = container.getPricingPlansUseCase
+                ) as T
+            }
+
             else -> error("Unknown ViewModel class: ${modelClass.name}")
         }
     }
