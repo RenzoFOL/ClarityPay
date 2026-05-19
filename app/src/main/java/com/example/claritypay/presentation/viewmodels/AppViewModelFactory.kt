@@ -44,6 +44,12 @@ class AppViewModelFactory(
                     addTransactionUseCase = container.addTransactionUseCase
                 ) as T
             }
+            modelClass.isAssignableFrom(ReceiptScannerViewModel::class.java) -> {
+                ReceiptScannerViewModel(
+                    getCurrentUserUseCase = container.getCurrentUserUseCase,
+                    addTransactionUseCase = container.addTransactionUseCase
+                ) as T
+            }
             modelClass.isAssignableFrom(SubscriptionsViewModel::class.java) -> {
                 SubscriptionsViewModel(
                     getCurrentUserUseCase = container.getCurrentUserUseCase,

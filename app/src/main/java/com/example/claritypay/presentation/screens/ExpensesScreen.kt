@@ -2,9 +2,15 @@ package com.example.claritypay.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,14 +31,23 @@ import com.example.claritypay.presentation.viewmodels.AppViewModelFactory
 import com.example.claritypay.presentation.viewmodels.ExpensesViewModel
 
 @Composable
-fun ExpensesScreenRoute() {
+fun ExpensesScreenRoute(
+    onScanReceipt: () -> Unit
+) {
     val app = LocalContext.current.applicationContext as ClarityPayApp
     val viewModel: ExpensesViewModel = viewModel(factory = AppViewModelFactory(app.container))
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showAddExpense by remember { mutableStateOf(false) }
     AppScaffold(title = "Gastos") {
-        Button(onClick = { showAddExpense = true }) {
-            Text("Nuevo gasto")
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { showAddExpense = true }, modifier = Modifier.weight(1f)) {
+                Text("Nuevo gasto")
+            }
+            Button(onClick = onScanReceipt, modifier = Modifier.weight(1f)) {
+                Icon(Icons.Default.PhotoCamera, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Escanear ticket")
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
         InfoMessageCard("Agrupados por categoria para mantener la vista simple en esta primera version.")

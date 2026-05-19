@@ -101,7 +101,20 @@ fun ClarityPayAppRoot(sessionViewModel: SessionViewModel) {
                 )
             }
             composable(AppDestination.Expenses.route) {
-                ExpensesScreenRoute()
+                ExpensesScreenRoute(
+                    onScanReceipt = { navController.navigate(AppDestination.ReceiptScanner.route) }
+                )
+            }
+            composable(AppDestination.ReceiptScanner.route) {
+                ReceiptScannerScreenRoute(
+                    onBack = { navController.popBackStack() },
+                    onSaved = {
+                        navController.navigate(AppDestination.Expenses.route) {
+                            popUpTo(AppDestination.ReceiptScanner.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
             }
             composable(AppDestination.Statistics.route) {
                 StatisticsScreenRoute()

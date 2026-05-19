@@ -21,6 +21,7 @@ sealed class AppDestination(
     // Destinos con Barra Inferior
     data object Home : AppDestination("home", "Inicio", Icons.Default.Home)
     data object Expenses : AppDestination("expenses", "Gastos", Icons.Default.ReceiptLong)
+    data object ReceiptScanner : AppDestination("receipt_scanner")
     data object Statistics : AppDestination("statistics", "Estadísticas", Icons.Default.Assessment) // CU-14
     data object Transactions : AppDestination("transactions", "Historial", Icons.Default.History)
     data object Profile : AppDestination("profile", "Perfil", Icons.Default.AccountCircle) // CU-10
