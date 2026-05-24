@@ -65,8 +65,10 @@ class AppViewModelFactory(
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> {
                 ProfileViewModel(
                     getCurrentUserUseCase = container.getCurrentUserUseCase,
-                    updateProfileUseCase = container.updateProfileUseCase
+                    updateProfileUseCase = container.updateProfileUseCase,
+                    deleteAccountUseCase = container.deleteAccountUseCase
                 ) as T
+
             }
             modelClass.isAssignableFrom(StatisticsViewModel::class.java) -> {
                 StatisticsViewModel(
@@ -90,6 +92,13 @@ class AppViewModelFactory(
             modelClass.isAssignableFrom(PlansViewModel::class.java) -> {
                 PlansViewModel(
                     getPricingPlansUseCase = container.getPricingPlansUseCase
+                ) as T
+            }
+
+            modelClass.isAssignableFrom(SettingsViewModel::class.java) -> {
+                SettingsViewModel(
+                    getSettingsUseCase = container.getSettingsUseCase,
+                    updateSettingsUseCase = container.updateSettingsUseCase
                 ) as T
             }
 

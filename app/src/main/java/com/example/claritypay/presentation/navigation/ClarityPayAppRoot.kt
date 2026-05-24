@@ -123,12 +123,30 @@ fun ClarityPayAppRoot(sessionViewModel: SessionViewModel) {
                 TransactionsScreenRoute()
             }
             composable(AppDestination.Profile.route) {
-                ProfileScreenRoute()
+                ProfileScreenRoute(
+                    onNavigateToSettings = {
+                        navController.navigate(AppDestination.Settings.route)
+                    },
+                    onLogout = {
+                        navController.navigate(AppDestination.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
             // --- DESTINO FASE 3: Suscripciones ---
             composable(AppDestination.Subscriptions.route) {
                 // Llamamos a la función Route que creamos en SubscriptionsScreen.kt
                 SubscriptionsScreenRoute()
+            }
+
+            // --- DESTINO FASE 5: Configuración ---
+            composable(AppDestination.Settings.route) {
+                SettingsScreenRoute(
+                    onNavigateBack = {
+                        navController.popBackStack() // Para regresar al perfil
+                    }
+                )
             }
         }
     }

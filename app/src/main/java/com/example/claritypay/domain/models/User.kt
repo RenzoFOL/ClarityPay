@@ -4,6 +4,7 @@ data class User(
     val id: Long,
     val fullName: String,
     val email: String,
+    val password: String = "",
     val bio: String? = null,
     val profileImageUrl: String? = null
 )

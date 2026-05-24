@@ -72,16 +72,18 @@ class AuthRepositoryImpl(
         userDao.logoutAll()
     }
 
-    // --- NUEVOS MÉTODOS FASE 2 ---
+    // --- MÉTODOS FASE 2 ---
 
     override suspend fun updateProfile(user: User): AppResult<Unit> {
         return try {
             val currentEntity = userDao.getUserById(user.id)
             if (currentEntity != null) {
-                // Usamos .copy() para actualizar solo lo necesario sin perder la contraseña
+                // Actualizamos nombre, email y contraseña según los cambios de la UI
                 userDao.update(
                     currentEntity.copy(
                         fullName = user.fullName,
+                        email = user.email,
+                        password = user.password,
                         bio = user.bio,
                         profileImageUrl = user.profileImageUrl
                     )
@@ -108,6 +110,22 @@ class AuthRepositoryImpl(
         } catch (e: Exception) {
             AppResult.Error(e.message ?: "Error al recuperar la contraseña.")
         }
+    }
+
+    // --- NUEVO MÉTODO FASE 6 (ELIMINAR CUENTA) ---
+
+    @Transaction
+    override suspend fun deleteAccount(userId: Long) {
+        // Borramos al usuario
+        userDao.deleteUserById(userId)
+
+        // Es una buena práctica limpiar también sus transacciones y suscripciones
+        // para que no queden datos "huérfanos" en la base de datos.
+        // Asegúrate de tener estos métodos en tus DAOs o puedes comentarlos si usas CASCADE en Room.
+        /*
+        transactionDao.deleteAllByUserId(userId)
+        subscriptionDao.deleteAllByUserId(userId)
+        */
     }
 
     // ----------------------------
@@ -160,10 +178,12 @@ class AuthRepositoryImpl(
     }
 }
 
+// Se añade el mapeo de password para que el ViewModel pueda leerla y modificarla en la UI
 private fun UserEntity.toDomain(): User = User(
     id = id,
     fullName = fullName,
     email = email,
+    password = password,
     bio = bio,
     profileImageUrl = profileImageUrl
 )

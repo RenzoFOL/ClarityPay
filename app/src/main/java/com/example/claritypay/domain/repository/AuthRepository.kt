@@ -12,4 +12,6 @@ interface AuthRepository {
     suspend fun seedDemoUserIfNeeded()
     suspend fun updateProfile(user: User): AppResult<Unit>
     suspend fun resetPassword(email: String, newPassword: String): AppResult<Unit>
+
+    suspend fun deleteAccount(userId: Long)
 }

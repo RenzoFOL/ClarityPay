@@ -25,6 +25,7 @@ sealed class AppDestination(
     data object Statistics : AppDestination("statistics", "Estadísticas", Icons.Default.Assessment) // CU-14
     data object Transactions : AppDestination("transactions", "Historial", Icons.Default.History)
     data object Profile : AppDestination("profile", "Perfil", Icons.Default.AccountCircle) // CU-10
+    data object Settings : AppDestination("Configuración")
 
     data object Subscriptions : AppDestination(
         route = "subscriptions",

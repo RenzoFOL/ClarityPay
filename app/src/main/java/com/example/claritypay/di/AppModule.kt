@@ -4,17 +4,19 @@ import android.content.Context
 import com.example.claritypay.data.local.AppDatabase
 import com.example.claritypay.data.repository.AuthRepositoryImpl
 import com.example.claritypay.data.repository.FinanceRepositoryImpl
+import com.example.claritypay.data.repository.SettingsRepositoryImpl
 import com.example.claritypay.data.repository.SubscriptionRepositoryImpl
 import com.example.claritypay.domain.repository.AuthRepository
 import com.example.claritypay.domain.repository.FinanceRepository
+import com.example.claritypay.domain.repository.SettingsRepository
 import com.example.claritypay.domain.repository.SubscriptionRepository
 import com.example.claritypay.domain.usecases.*
 
 interface AppContainer {
     val authRepository: AuthRepository
     val financeRepository: FinanceRepository
-
-    val subscriptionRepository: SubscriptionRepository // Nuevo Fase 3
+    val subscriptionRepository: SubscriptionRepository // Fase 3
+    val settingsRepository: SettingsRepository // Fase 5
 
     val getCurrentUserUseCase: GetCurrentUserUseCase
     val loginUseCase: LoginUseCase
@@ -39,6 +41,11 @@ interface AppContainer {
     //AGREGADOS LOS CONTRATOS PARA LA FASE 4 ---
     val getInsightsUseCase: GetInsightsUseCase
     val getPricingPlansUseCase: GetPricingPlansUseCase
+
+    // --- FASE 5 ---
+    val getSettingsUseCase: GetSettingsUseCase
+    val updateSettingsUseCase: UpdateSettingsUseCase
+    val deleteAccountUseCase: DeleteAccountUseCase
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -60,7 +67,10 @@ class AppDataContainer(private val context: Context) : AppContainer {
         SubscriptionRepositoryImpl(database.subscriptionDao())
     }
 
-
+    // --- REPOSITORIO FASE 5 ---
+    override val settingsRepository: SettingsRepository by lazy {
+        SettingsRepositoryImpl(context)
+    }
 
     override val getCurrentUserUseCase: GetCurrentUserUseCase by lazy { GetCurrentUserUseCase(authRepository) }
     override val loginUseCase: LoginUseCase by lazy { LoginUseCase(authRepository) }
@@ -106,4 +116,14 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val getPricingPlansUseCase by lazy {
         GetPricingPlansUseCase()
     }
+
+    // --- INSTANCIAS FASE 5 ---
+    override val getSettingsUseCase: GetSettingsUseCase by lazy {
+        GetSettingsUseCase(settingsRepository)
+    }
+    override val updateSettingsUseCase: UpdateSettingsUseCase by lazy {
+        UpdateSettingsUseCase(settingsRepository)
+    }
+    override val deleteAccountUseCase by lazy {
+        DeleteAccountUseCase(authRepository) }
 }
