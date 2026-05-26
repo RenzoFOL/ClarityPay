@@ -74,4 +74,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // Agrega la librería de gráficos (vico)
+    implementation("com.patrykandpatrick.vico:compose:1.13.0")
 }

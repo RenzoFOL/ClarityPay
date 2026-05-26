@@ -15,8 +15,8 @@ import com.example.claritypay.domain.usecases.*
 interface AppContainer {
     val authRepository: AuthRepository
     val financeRepository: FinanceRepository
-    val subscriptionRepository: SubscriptionRepository // Fase 3
-    val settingsRepository: SettingsRepository // Fase 5
+    val subscriptionRepository: SubscriptionRepository
+    val settingsRepository: SettingsRepository
 
     val getCurrentUserUseCase: GetCurrentUserUseCase
     val loginUseCase: LoginUseCase

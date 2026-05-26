@@ -5,7 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items // Importante para la lista de planes
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -25,7 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.claritypay.ClarityPayApp
 import com.example.claritypay.presentation.viewmodels.AppViewModelFactory
 import com.example.claritypay.presentation.viewmodels.ProfileViewModel
-import com.example.claritypay.presentation.viewmodels.PlansViewModel // Añadido
+import com.example.claritypay.presentation.viewmodels.PlansViewModel
 import com.example.claritypay.domain.models.PricingPlan
 
 @Composable
@@ -155,7 +155,14 @@ fun ProfileScreen(
 
             // 5. Botón Guardar Cambios
             Button(
-                onClick = { viewModel.saveChanges(nombre, usuario, contrasena) },
+                onClick = {
+                    // --- VALIDACIÓN AÑADIDA AQUÍ ---
+                    if (contrasena.isNotBlank() && contrasena.length < 6) {
+                        Toast.makeText(context, "La contraseña debe tener mínimo 6 caracteres.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        viewModel.saveChanges(nombre, usuario, contrasena)
+                    }
+                },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF287C71))

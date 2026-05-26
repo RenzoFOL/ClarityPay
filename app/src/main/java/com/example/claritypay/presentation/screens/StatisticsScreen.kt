@@ -23,6 +23,14 @@ import com.example.claritypay.presentation.viewmodels.AppViewModelFactory
 import com.example.claritypay.presentation.viewmodels.InsightsViewModel
 import com.example.claritypay.presentation.viewmodels.StatisticsViewModel
 
+// --- IMPORTACIONES DE LA LIBRERÍA DE GRÁFICOS VICO ---
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.column.columnChart
+import com.patrykandpatrick.vico.core.axis.AxisPosition
+import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
+
 @Composable
 fun StatisticsScreenRoute() {
     val context = LocalContext.current
@@ -51,13 +59,59 @@ fun StatisticsScreen(statsViewModel: StatisticsViewModel, insightsViewModel: Ins
         Spacer(modifier = Modifier.height(16.dp))
 
         if (selectedTab == 0) {
-            // CÓDIGO ORIGINAL SIN ALTERAR LOGICA
+            // PESTAÑA CATEGORÍAS (Con Gráfica Integrada)
             if (stats.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Registra gastos para ver estadísticas", style = MaterialTheme.typography.bodyLarge)
                 }
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+
+                    // --- NUEVO: GRÁFICO DE BARRAS EN LA PARTE SUPERIOR ---
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = "Gastos por Categoría",
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                // Formateador para poner los nombres de tus categorías en el Eje X
+                                val xAxisFormatter = AxisValueFormatter<AxisPosition.Horizontal.Bottom> { value, _ ->
+                                    stats.getOrNull(value.toInt())?.category ?: ""
+                                }
+
+                                Chart(
+                                    chart = columnChart(),
+                                    chartModelProducer = statsViewModel.chartEntryModelProducer,
+                                    startAxis = rememberStartAxis(),
+                                    bottomAxis = rememberBottomAxis(valueFormatter = xAxisFormatter),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp)
+                                )
+                            }
+                        }
+
+                        Text(
+                            text = "Desglose de Gastos",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    // --- ORIGINAL: LISTA DE DESGLOSE INTACTA ---
                     items(stats) { item ->
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -72,7 +126,7 @@ fun StatisticsScreen(statsViewModel: StatisticsViewModel, insightsViewModel: Ins
                 }
             }
         } else {
-            // VISTA NUEVA EXCLUSIVA DE INSIGHTS
+            // VISTA ORIGINAL EXCLUSIVA DE INSIGHTS (Intacta)
             LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 items(insights) { insight ->
                     InsightCardItem(insight)

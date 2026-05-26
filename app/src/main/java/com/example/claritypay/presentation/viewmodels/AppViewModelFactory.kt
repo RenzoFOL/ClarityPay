@@ -101,7 +101,6 @@ class AppViewModelFactory(
                     updateSettingsUseCase = container.updateSettingsUseCase
                 ) as T
             }
-
             else -> error("Unknown ViewModel class: ${modelClass.name}")
         }
     }

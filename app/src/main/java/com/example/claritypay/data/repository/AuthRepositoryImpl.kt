@@ -176,9 +176,16 @@ class AuthRepositoryImpl(
             )
         )
     }
+
+    override suspend fun getUserByEmail(email: String): User? {
+        return userDao.getUserByEmail(email)?.toDomain()
+    }
+
+    override suspend fun updatePassword(email: String, newPassword: String) {
+        userDao.updatePassword(email, newPassword)
+    }
 }
 
-// Se añade el mapeo de password para que el ViewModel pueda leerla y modificarla en la UI
 private fun UserEntity.toDomain(): User = User(
     id = id,
     fullName = fullName,

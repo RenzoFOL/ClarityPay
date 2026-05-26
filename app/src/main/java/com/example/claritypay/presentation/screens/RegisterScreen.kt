@@ -1,5 +1,6 @@
 package com.example.claritypay.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -55,6 +59,10 @@ private fun RegisterScreen(
     onCreateAccountClick: () -> Unit,
     onBackToLogin: () -> Unit
 ) {
+    // Variable local para el campo de confirmar contraseña
+    var confirmPassword by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -90,17 +98,39 @@ private fun RegisterScreen(
                 OutlinedTextField(
                     value = state.password,
                     onValueChange = onPasswordChange,
-                    label = { Text("Contrasena") },
+                    label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation()
                 )
+                Spacer(modifier = Modifier.height(12.dp))
+                // --- NUEVO CAMPO: Confirmar contraseña ---
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    label = { Text("Confirmar contraseña") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
                 state.errorMessage?.let {
                     Spacer(modifier = Modifier.height(12.dp))
                     InfoMessageCard(it)
                 }
                 Spacer(modifier = Modifier.height(18.dp))
                 Button(
-                    onClick = onCreateAccountClick,
+                    onClick = {
+                        // --- VALIDACIONES AL PRESIONAR EL BOTÓN ---
+                        if (state.fullName.isBlank() || state.email.isBlank() || state.password.isBlank() || confirmPassword.isBlank()) {
+                            Toast.makeText(context, "Por favor, llena todos los campos.", Toast.LENGTH_SHORT).show()
+                        } else if (state.password.length < 6) {
+                            Toast.makeText(context, "La contraseña debe tener mínimo 6 caracteres.", Toast.LENGTH_SHORT).show()
+                        } else if (state.password != confirmPassword) {
+                            Toast.makeText(context, "Las contraseñas no coinciden.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Si todo es correcto, ejecuta la función original
+                            onCreateAccountClick()
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !state.isLoading
                 ) {

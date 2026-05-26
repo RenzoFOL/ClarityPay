@@ -14,4 +14,8 @@ interface AuthRepository {
     suspend fun resetPassword(email: String, newPassword: String): AppResult<Unit>
 
     suspend fun deleteAccount(userId: Long)
+
+    suspend fun getUserByEmail(email: String): User?
+
+    suspend fun updatePassword(email: String, newPassword: String)
 }
